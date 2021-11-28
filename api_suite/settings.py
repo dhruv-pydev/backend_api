@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-mf$mwi$sdyid%vpw95+9+ire0cu+6pn2o^rvtbj(bfv^!w@ir5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "https://stackoverflow-apisuite.herokuapp.com",
