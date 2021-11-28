@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from lib.filters import QuestionFilter
 from .models import Answer, BaseUser, Question, Tag, Vote
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -104,6 +106,26 @@ class QuestionSerializer(serializers.ModelSerializer):
 
         return question
 
+    @transaction.atomic()
+    def update(self, instance, validated_data):
+        tags = validated_data.pop("tags", None)
+        user = self.context.get("request").user
+        base_user = user.base_user
+        validated_data["user"] = base_user
+        instance = super(QuestionSerializer, self).update(
+            instance, validated_data)
+
+        if tags:
+            tags_to_add = [tag.id for tag in tags]
+            existing_tags = instance.tags.all()
+            tags_to_remove = existing_tags.exclude(
+                id__in=tags_to_add).values_list("id", flat=True)
+            instance.tags.set(tags_to_add)
+            if tags_to_remove:
+                instance.tags.remove(tags_to_remove)
+
+        return instance
+
 
 class AnswerSerializer(serializers.ModelSerializer):
     question = serializers.SlugRelatedField(
@@ -125,6 +147,14 @@ class VoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vote
         exclude = ["user", ]
+
+    def validate(self, attrs):
+        type = attrs.get("type")
+        user_votes = self.context.get("all_votes")
+        if user_votes and user_votes.filter(type=type).exists():
+            raise serializers.ValidationError(
+                f"You already have {type} for this entry!")
+        return super().validate(attrs)
 
     def create(self, validated_data):
         user = self.context.get("request").user
