@@ -3,3 +3,4 @@ api_env
 db.sqlite3
 migrations
 logs
+static
