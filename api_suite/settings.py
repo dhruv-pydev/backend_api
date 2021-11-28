@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-mf$mwi$sdyid%vpw95+9+ire0cu+6pn2o^rvtbj(bfv^!w@ir5
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    "https://stackoverflow-apisuite.herokuapp.com/",
+    "https://stackoverflow-apisuite.herokuapp.com",
     "127.0.0.1",
     "localhost"
 ]
